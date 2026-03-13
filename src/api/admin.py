@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import httpx
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -90,6 +90,17 @@ class ImportRequest(BaseModel):
 
 @router.post("/accounts/import", dependencies=_auth)
 async def import_accounts(req: ImportRequest):
+    count = _tm.import_accounts(req.accounts)
+    return {"ok": True, "imported": count}
+
+
+@router.post("/accounts/push")
+async def push_accounts(req: ImportRequest, request: Request):
+    """外部推送账号接口，使用 API Key 鉴权（无需登录）"""
+    from ..core.auth import _extract_token
+    token = _extract_token(request)
+    if not token or not _km or not _km.validate(token):
+        return JSONResponse(status_code=401, content={"ok": False, "message": "Invalid API Key"})
     count = _tm.import_accounts(req.accounts)
     return {"ok": True, "imported": count}
 
