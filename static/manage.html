@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理控制台 - OB1 2API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="/static/manage.css">
+    <script>
+        tailwind.config={theme:{extend:{colors:{border:"hsl(0 0% 89%)",input:"hsl(0 0% 89%)",ring:"hsl(0 0% 3.9%)",background:"hsl(0 0% 100%)",foreground:"hsl(0 0% 3.9%)",primary:{DEFAULT:"hsl(0 0% 9%)",foreground:"hsl(0 0% 98%)"},secondary:{DEFAULT:"hsl(0 0% 96.1%)",foreground:"hsl(0 0% 9%)"},muted:{DEFAULT:"hsl(0 0% 96.1%)",foreground:"hsl(0 0% 45.1%)"},destructive:{DEFAULT:"hsl(0 84.2% 60.2%)",foreground:"hsl(0 0% 98%)"}}}}}
+    </script>
+</head>
+<body class="h-full bg-background text-foreground antialiased">
+    <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur">
+        <div class="mx-auto flex h-14 max-w-7xl items-center px-6">
+            <span class="font-bold text-xl mr-4">OB1 2API</span>
+            <div class="flex flex-1 items-center justify-end gap-3">
+                <a href="https://github.com/your-username/ob12api" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors h-7 w-7 rounded" title="GitHub">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                </a>
+                <button onclick="logout()" class="inline-flex items-center justify-center text-xs transition-colors hover:bg-secondary h-7 px-2.5 gap-1 rounded">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    退出
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-6">
+        <div class="border-b border-border mb-6">
+            <nav class="flex space-x-8">
+                <button onclick="switchTab('accounts')" id="tabAccounts" class="tab-btn border-b-2 border-primary text-sm font-medium py-3 px-1">账号管理</button>
+                <button onclick="switchTab('settings')" id="tabSettings" class="tab-btn border-b-2 border-transparent text-sm font-medium py-3 px-1 text-muted-foreground">系统设置</button>
+                <button onclick="switchTab('chat')" id="tabChat" class="tab-btn border-b-2 border-transparent text-sm font-medium py-3 px-1 text-muted-foreground">聊天测试</button>
+            </nav>
+        </div>
+
+        <!-- 账号管理 -->
+        <div id="panelAccounts">
+            <div class="grid gap-4 grid-cols-2 md:grid-cols-4 mb-6">
+                <div class="rounded-lg border border-border bg-background p-4">
+                    <p class="text-sm font-medium text-muted-foreground mb-1">OB1 账号</p>
+                    <h3 class="text-2xl font-bold" id="statTotal">-</h3>
+                </div>
+                <div class="rounded-lg border border-border bg-background p-4">
+                    <p class="text-sm font-medium text-muted-foreground mb-1">活跃账号</p>
+                    <h3 class="text-2xl font-bold text-green-600" id="statActive">-</h3>
+                </div>
+                <div class="rounded-lg border border-border bg-background p-4">
+                    <p class="text-sm font-medium text-muted-foreground mb-1">总消耗</p>
+                    <h3 class="text-2xl font-bold text-blue-600" id="statCost">$0.00</h3>
+                </div>
+                <div class="rounded-lg border border-border bg-background p-4">
+                    <p class="text-sm font-medium text-muted-foreground mb-1">总请求</p>
+                    <h3 class="text-2xl font-bold text-purple-600" id="statRequests">-</h3>
+                </div>
+            </div>
+
+            <div class="rounded-lg border border-border bg-background mb-6">
+                <div class="flex items-center justify-between gap-4 p-4 border-b border-border">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-lg font-semibold">OB1 账号</h3>
+                        <select id="accountFilter" onchange="renderAccounts()" class="text-xs h-7 rounded-md border border-input bg-background px-2">
+                            <option value="all">全部</option>
+                            <option value="active">活跃</option>
+                            <option value="expired">已过期</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-muted-foreground">自动刷新AT</span>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="atAutoRefreshToggle" class="sr-only peer" checked>
+                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                        <button onclick="loadAccounts()" class="inline-flex items-center justify-center rounded-md transition-colors hover:bg-secondary h-8 w-8" title="刷新">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        </button>
+                        <div class="batch-dropdown-container">
+                            <button class="batch-dropdown-btn">批量操作<svg class="batch-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+                            <div class="batch-dropdown-menu">
+                                <button onclick="refreshAllAccounts()" class="batch-dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                    <span>全部刷新</span>
+                                </button>
+                                <button onclick="batchDeleteAccounts()" class="batch-dropdown-item" style="color:#dc2626">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                    <span>批量删除</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="exportAccounts()" class="inline-flex items-center justify-center rounded-md text-xs font-medium h-8 px-3 bg-blue-600 text-white hover:bg-blue-700 transition-colors">导出</button>
+                        <button onclick="importAccounts()" class="inline-flex items-center justify-center rounded-md text-xs font-medium h-8 px-3 bg-green-600 text-white hover:bg-green-700 transition-colors">导入</button>
+                        <button onclick="openDeviceAuth()" class="inline-flex items-center justify-center rounded-md text-xs font-medium h-8 px-3 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">添加账号</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-border text-left text-xs text-muted-foreground">
+                                <th class="px-4 py-2 w-8"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="rounded"></th>
+                                <th class="px-4 py-2 font-medium">邮箱</th>
+                                <th class="px-4 py-2 font-medium">AT</th>
+                                <th class="px-4 py-2 font-medium">RT</th>
+                                <th class="px-4 py-2 font-medium">状态</th>
+                                <th class="px-4 py-2 font-medium text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountList"></tbody>
+                    </table>
+                </div>
+                <div id="accountFooter" class="px-4 py-2.5 border-t border-border text-xs text-muted-foreground"></div>
+            </div>
+        </div>
+
+        <!-- 系统设置 -->
+        <div id="panelSettings" class="hidden">
+            <div class="grid gap-6 lg:grid-cols-2">
+                <!-- 安全配置 -->
+                <div class="rounded-lg border border-border bg-background p-6">
+                    <h3 class="text-base font-semibold mb-4">安全配置</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm text-muted-foreground">管理员用户名</label>
+                            <div class="flex gap-2 mt-1">
+                                <input id="cfgUsername" class="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm" placeholder="admin">
+                                <button onclick="updateUsername()" class="shrink-0 h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90">保存</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm text-muted-foreground">修改密码</label>
+                            <input id="cfgOldPwd" type="password" class="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm mt-1" placeholder="旧密码">
+                            <input id="cfgNewPwd" type="password" class="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm mt-2" placeholder="新密码">
+                            <button onclick="updatePassword()" class="mt-2 h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90">修改密码</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- API 密钥配置 -->
+                <div class="rounded-lg border border-border bg-background p-6">
+                    <h3 class="text-base font-semibold mb-4">API 密钥配置</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm text-muted-foreground">当前 API Key</label>
+                            <input id="cfgCurrentKey" class="flex h-9 w-full rounded-md border border-input bg-secondary px-3 text-sm mt-1" readonly>
+                        </div>
+                        <div>
+                            <label class="text-sm text-muted-foreground">新 API Key</label>
+                            <div class="flex gap-2 mt-1">
+                                <input id="cfgNewKey" class="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm" placeholder="输入新的 API Key">
+                                <button onclick="updateAPIKey()" class="shrink-0 h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90">更新</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 代理配置 -->
+                <div class="rounded-lg border border-border bg-background p-6">
+                    <h3 class="text-base font-semibold mb-4">代理配置</h3>
+                    <div>
+                        <label class="text-sm text-muted-foreground">代理 URL</label>
+                        <div class="flex gap-2 mt-1">
+                            <input id="cfgProxy" class="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm" placeholder="http://127.0.0.1:7890">
+                            <button id="btnTestProxy" onclick="testProxy()" class="shrink-0 h-9 px-3 rounded-md border border-input bg-background text-sm hover:bg-secondary">测试</button>
+                            <button onclick="updateProxy()" class="shrink-0 h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90">保存</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 调度模式 -->
+                <div class="rounded-lg border border-border bg-background p-6">
+                    <h3 class="text-base font-semibold mb-4">调度模式</h3>
+                    <div>
+                        <label class="text-sm text-muted-foreground">选择调度策略</label>
+                        <div class="flex gap-2 mt-1">
+                            <select id="cfgRotationMode" onchange="selectRotation(this.value)" class="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm">
+                                <option value="cache-first">缓存优先 — 优先使用上次成功的账号</option>
+                                <option value="balanced">平衡轮换 — 均衡分配请求负载</option>
+                                <option value="performance">性能优先 — 随机选择，适合高并发</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- 自动刷新 -->
+                <div class="rounded-lg border border-border bg-background p-6">
+                    <h3 class="text-base font-semibold mb-4">Token 自动续期</h3>
+                    <div>
+                        <label class="text-sm text-muted-foreground">检查间隔（分钟），0 为关闭</label>
+                        <div class="flex gap-2 mt-1">
+                            <input id="cfgRefreshInterval" type="number" min="0" class="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm" placeholder="0">
+                            <button onclick="updateRefreshInterval()" class="shrink-0 h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90">保存</button>
+                        </div>
+                        <p class="text-xs text-muted-foreground mt-1">定时检查 Token 有效期，仅在临近过期时才刷新</p>
+                    </div>
+                </div>
+                <!-- 调试日志 -->
+                <div class="rounded-lg border border-border bg-background p-6">
+                    <h3 class="text-base font-semibold mb-4">调试日志</h3>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-muted-foreground">开启后输出详细请求日志</span>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfgDebugLog" onchange="toggleDebugLog()" class="sr-only peer">
+                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天测试 -->
+        <div id="panelChat" class="hidden">
+            <div class="rounded-lg border border-border bg-background">
+                <div class="flex items-center gap-3 p-4 border-b border-border">
+                    <select id="chatModel" class="h-9 rounded-md border border-input bg-background px-3 text-sm">
+                        <option value="">加载中...</option>
+                    </select>
+                    <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="chatStream" checked class="rounded"> Stream</label>
+                    <button onclick="clearChat()" class="ml-auto text-xs px-3 h-8 rounded-md border border-border hover:bg-secondary transition-colors">清空</button>
+                </div>
+                <div id="chatMessages" class="h-[400px] overflow-y-auto p-4 space-y-2"></div>
+                <div class="p-4 border-t border-border flex gap-2">
+                    <textarea id="chatInput" rows="1" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none" placeholder="输入消息..."></textarea>
+                    <button onclick="sendChat()" class="shrink-0 h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90">发送</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Device Auth Modal -->
+    <div id="deviceAuthModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 class="text-lg font-semibold mb-4">添加 OB1 账号</h3>
+            <div id="deviceAuthContent">
+                <p class="text-sm text-muted-foreground mb-4">点击下方按钮开始设备授权流程</p>
+                <button onclick="startDeviceAuth()" class="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90">开始授权</button>
+            </div>
+            <div id="deviceAuthPending" class="hidden text-center">
+                <p class="text-sm mb-2">请在浏览器中完成授权:</p>
+                <a id="deviceAuthLink" href="#" target="_blank" class="text-blue-600 text-sm underline break-all"></a>
+                <p class="text-xs text-muted-foreground mt-3">用户码: <span id="deviceAuthCode" class="font-mono font-bold"></span></p>
+                <div class="flex items-center justify-center gap-1 mt-4">
+                    <span class="typing-dot w-2 h-2 rounded-full bg-primary"></span>
+                    <span class="typing-dot w-2 h-2 rounded-full bg-primary"></span>
+                    <span class="typing-dot w-2 h-2 rounded-full bg-primary"></span>
+                    <span class="text-xs text-muted-foreground ml-2">等待授权...</span>
+                </div>
+            </div>
+            <button onclick="closeDeviceAuth()" class="mt-4 text-xs text-muted-foreground hover:text-foreground">关闭</button>
+        </div>
+    </div>
+
+    <script src="/static/manage.js"></script>
+</body>
+</html>

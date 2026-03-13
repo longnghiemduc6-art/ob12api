@@ -1,0 +1,35 @@
+@keyframes slide-up{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.animate-slide-up{animation:slide-up .3s ease-out}
+.tab-btn{transition:all .2s ease}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+.typing-dot{animation:pulse-dot 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+.chat-msg pre{background:#f3f4f6;border-radius:6px;padding:12px;overflow-x:auto;margin:8px 0}
+.chat-msg code{font-size:13px}
+.chat-msg p{margin:4px 0}
+.chat-msg ul,.chat-msg ol{margin:4px 0 4px 20px}
+
+/* Batch dropdown */
+.batch-dropdown-container{position:relative;display:inline-block}
+.batch-dropdown-btn{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 12px;background:#6366f1;color:white;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s ease}
+.batch-dropdown-btn:hover{background:#4f46e5}
+.batch-dropdown-arrow{margin-left:4px;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.batch-dropdown-container:hover .batch-dropdown-arrow{transform:rotate(180deg)}
+.batch-dropdown-menu{position:absolute;top:calc(100% + 4px);left:0;min-width:160px;background:white;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:50;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.batch-dropdown-container:hover .batch-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.batch-dropdown-item{display:flex;align-items:center;width:100%;padding:8px 12px;border:none;background:none;cursor:pointer;font-size:13px;color:#374151;transition:background .15s}
+.batch-dropdown-item:hover{background:#f3f4f6}
+.batch-dropdown-item svg{width:16px;height:16px;margin-right:8px;flex-shrink:0}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center}
+.modal-box{background:white;border-radius:8px;padding:24px;width:90%;max-width:480px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+/* Account card */
+.account-card{border:1px solid hsl(0 0% 89%);border-radius:8px;padding:16px;transition:box-shadow .2s}
+.account-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.account-status{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:9999px}
+.account-status.active{background:#dcfce7;color:#16a34a}
+.account-status.expired{background:#fee2e2;color:#dc2626}
+.account-status.unknown{background:#f3f4f6;color:#6b7280}

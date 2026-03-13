@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  ob12api:
+    build: .
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    restart: unless-stopped

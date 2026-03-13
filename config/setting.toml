@@ -1,0 +1,29 @@
+[global]
+api_key = "your-api-key"
+
+[server]
+host = "0.0.0.0"
+port = 8081
+
+[admin]
+username = "admin"
+password = "admin"
+
+[proxy]
+url = ""
+
+[retry]
+max_retries = 3
+retry_delay = 1
+
+[ob1]
+credentials_path = ""
+workos_auth_url = "https://api.workos.com/user_management/authenticate"
+workos_client_id = "client_01K8YDZSSKDMK8GYTEHBAW4N4S"
+api_base = "https://dashboard.openblocklabs.com/api/v1"
+refresh_buffer_seconds = 600
+rotation_mode = "balanced"
+refresh_interval = 60
+
+[logging]
+level = "INFO"
